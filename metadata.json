@@ -1,0 +1,6 @@
+{
+  "name": "GIG//PORTAL — A Human-Only Story",
+  "description": "A dark, interactive story about a final-year engineering student whose job applications were all answered by AI, navigating the automated job market through 100% human-only gigs.",
+  "requestFrame": "custom",
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

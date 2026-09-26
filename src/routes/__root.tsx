@@ -77,14 +77,20 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "Lovable App" },
-      { name: "description", content: "Lovable Generated Project" },
-      { name: "author", content: "Lovable" },
-      { property: "og:title", content: "Lovable App" },
-      { property: "og:description", content: "Lovable Generated Project" },
+      { title: "GIG//PORTAL — A Human-Only Story" },
+      {
+        name: "description",
+        content:
+          "A dark, interactive story about a final-year engineering student whose job applications were all answered by AI, navigating the automated job market through 100% human-only gigs.",
+      },
+      { property: "og:title", content: "GIG//PORTAL — A Human-Only Story" },
+      {
+        property: "og:description",
+        content:
+          "A dark, interactive story about a final-year engineering student whose job applications were all answered by AI, navigating the automated job market through 100% human-only gigs.",
+      },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
-      { name: "twitter:site", content: "@Lovable" },
     ],
     links: [
       {

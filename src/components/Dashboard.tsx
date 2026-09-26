@@ -1,11 +1,5 @@
 import React, { useState } from "react";
-import {
-  Radio,
-  Vote,
-  ShieldAlert,
-  Skull,
-  ArrowRight,
-} from "lucide-react";
+import { Radio, Vote, ShieldAlert, Skull, ArrowRight, Brain } from "lucide-react";
 
 export interface JobGig {
   id: string;
@@ -19,13 +13,23 @@ export interface JobGig {
 
 export const GIG_JOBS: JobGig[] = [
   {
+    id: "technical-interview",
+    title: "Technical Job Interview",
+    description:
+      "Push forward! keep on trying for interviews anyway!! Face the ruthless AI Interrogator bot, inverted binary trees, LeetCode 9000, and live corporate panic rounds before time runs out!",
+    cardColor: "bg-purple-50 text-stone-900 border-purple-200/90",
+    tapeColor: "bg-purple-200/80 border-purple-300/60",
+    rotation: "-rotate-1",
+    icon: Brain,
+  },
+  {
     id: "fake-news-anchor",
     title: "Fake News Anchor",
     description:
       "Headline before deadline!! Fabricate news with given words to get clickbaits and most money possible in strict deadlines!",
     cardColor: "bg-yellow-50 text-stone-800 border-amber-200/90",
     tapeColor: "bg-amber-200/80 border-amber-300/60",
-    rotation: "-rotate-1",
+    rotation: "rotate-1",
     icon: Radio,
   },
   {
@@ -65,11 +69,7 @@ interface DashboardProps {
   onBackToDesktop?: () => void;
 }
 
-export function Dashboard({
-  debt = 50000,
-  onAcceptGig,
-  onBackToDesktop,
-}: DashboardProps) {
+export function Dashboard({ debt = 50000, onAcceptGig, onBackToDesktop }: DashboardProps) {
   const [acceptedId, setAcceptedId] = useState<string | null>(null);
 
   const handleAccept = (job: JobGig) => {
@@ -110,11 +110,20 @@ export function Dashboard({
         <header className="flex flex-col gap-6 sm:flex-row sm:items-start sm:justify-between border-b border-stone-800/80 pb-8">
           {/* Left: Title & Subtitle */}
           <div>
+            {onBackToDesktop && (
+              <button
+                onClick={onBackToDesktop}
+                className="mb-3 inline-flex items-center gap-1 rounded-md border border-stone-700 bg-stone-800/80 px-2.5 py-1 font-mono text-xs text-stone-300 hover:bg-stone-700 hover:text-stone-100 transition-colors cursor-pointer"
+              >
+                ← Back to Desktop
+              </button>
+            )}
             <h1 className="font-mono text-3xl sm:text-4xl font-black tracking-tight text-amber-100 drop-shadow-[0_2px_4px_rgba(0,0,0,0.6)]">
               Career Options (T_T)
             </h1>
             <p className="mt-1 font-mono text-xs sm:text-sm text-stone-400 italic">
-              desperate late-night job search... need to get employed and clear debt before midnight ☕
+              desperate late-night job search... need to get employed and clear debt before midnight
+              ☕
             </p>
           </div>
 
@@ -154,7 +163,8 @@ export function Dashboard({
             return (
               <div
                 key={job.id}
-                className={`group relative flex flex-col justify-between rounded-lg border p-6 shadow-md transition-all duration-300 hover:-translate-y-1 hover:shadow-lg ${job.cardColor} ${job.rotation}`}
+                onClick={() => handleAccept(job)}
+                className={`group relative flex flex-col justify-between rounded-lg border p-6 shadow-md transition-all duration-300 hover:-translate-y-1 hover:shadow-lg cursor-pointer ${job.cardColor} ${job.rotation}`}
               >
                 {/* Colored masking tape holding it up */}
                 <div
@@ -198,9 +208,7 @@ export function Dashboard({
 
         {/* Footer */}
         <footer className="mt-auto pt-6 pb-6 text-center font-mono text-xs text-stone-500">
-          <p>
-            ☕ Late-Night Dorm Room Job Hunt · Choose wisely, future awaits!
-          </p>
+          <p>☕ Late-Night Human Career Hunt · Choose wisely, future awaits!</p>
         </footer>
       </div>
     </div>
