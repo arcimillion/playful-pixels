@@ -1,4 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { FileText, FolderCode, Mail, Trash2 } from "lucide-react";
 import { useCallback, useEffect, useRef, useState } from "react";
 
 export const Route = createFileRoute("/")({
@@ -38,6 +39,33 @@ const REJECTION_EMAILS = [
   { sender: "careers@bluekernel.com", subject: "Update on your application", preview: "We will keep your resume on file for any future human roles...", time: "Sun" },
   { sender: "jobs@macrohard.example", subject: "Application Status: Junior SWE", preview: "Unfortunately, Copilot Ultra now writes 94% of our codebase...", time: "Sun" },
   { sender: "recruitment@voidworks.dev", subject: "Thank you for applying", preview: "Your profile was impressive, but our AI scored itself higher...", time: "Sat" },
+];
+
+const DESKTOP_ICONS = [
+  {
+    label: "Inbox",
+    Icon: Mail,
+    tone: "text-cyan-400",
+    glow: "drop-shadow-[0_0_8px_rgba(34,211,238,0.75)]",
+  },
+  {
+    label: "Resume.pdf",
+    Icon: FileText,
+    tone: "text-amber-400",
+    glow: "drop-shadow-[0_0_8px_rgba(251,191,36,0.75)]",
+  },
+  {
+    label: "Projects",
+    Icon: FolderCode,
+    tone: "text-cyan-300",
+    glow: "drop-shadow-[0_0_8px_rgba(103,232,249,0.75)]",
+  },
+  {
+    label: "Trash",
+    Icon: Trash2,
+    tone: "text-slate-400",
+    glow: "drop-shadow-[0_0_6px_rgba(148,163,184,0.5)]",
+  },
 ];
 
 function playNotificationSound() {
@@ -130,12 +158,16 @@ function Index() {
 
       {/* Desktop icons */}
       <div className="absolute top-16 left-6 flex flex-col gap-6">
-        {["Inbox", "Resume.pdf", "Projects", "Trash"].map((label) => (
-          <div key={label} className="flex w-16 flex-col items-center gap-1.5 opacity-70">
-            <div className="flex h-11 w-11 items-center justify-center rounded-xl border border-border/60 bg-card/60 backdrop-blur-sm">
-              <div className="h-5 w-5 rounded-sm bg-muted-foreground/40" />
+        {DESKTOP_ICONS.map(({ label, Icon, tone, glow }) => (
+          <div key={label} className="group flex w-16 flex-col items-center gap-1.5">
+            <div
+              className="flex h-11 w-11 cursor-pointer items-center justify-center rounded-xl border border-border/60 bg-slate-800/60 shadow-[inset_0_1px_0_rgba(255,255,255,0.06)] backdrop-blur transition-all duration-200 hover:scale-105 hover:border-cyan-500/50 hover:shadow-[0_0_20px_-2px_rgba(34,211,238,0.4),inset_0_1px_0_rgba(255,255,255,0.08)]"
+            >
+              <Icon size={20} strokeWidth={1.75} className={`${tone} ${glow}`} />
             </div>
-            <span className="text-center text-[10px] leading-tight text-foreground/70">{label}</span>
+            <span className="text-center text-[10px] leading-tight text-foreground/70 transition-colors group-hover:text-cyan-300">
+              {label}
+            </span>
           </div>
         ))}
       </div>
