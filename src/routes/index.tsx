@@ -1,7 +1,8 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { FileText, FolderCode, Mail, Trash2 } from "lucide-react";
 import { useCallback, useEffect, useRef, useState } from "react";
-import hackathonWallpaper from "@/assets/Hackathon.png.asset.json";
+import hackathonWallpaper from "@/assets/Hackathon.png";
+import { Dashboard } from "@/components/Dashboard";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -110,8 +111,16 @@ function Clock() {
 function Index() {
   const [scene, setScene] = useState<Scene>("desktop");
   const [showToast, setShowToast] = useState(false);
+  const [showAdDialogue, setShowAdDialogue] = useState(false);
   const [fading, setFading] = useState(false);
   const soundPlayed = useRef(false);
+
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    if (params.get("scene") === "dashboard") {
+      setScene("dashboard");
+    }
+  }, []);
 
   // Scene 1: notification slides in after 1.5s
   useEffect(() => {
@@ -134,22 +143,43 @@ function Index() {
     return () => clearTimeout(id);
   }, [scene]);
 
+  // Scene 5: Exactly 1 second after ad appears, trigger second narrative dialogue
+  useEffect(() => {
+    if (scene !== "ad") {
+      setShowAdDialogue(false);
+      return;
+    }
+    const id = setTimeout(() => setShowAdDialogue(true), 1000);
+    return () => clearTimeout(id);
+  }, [scene]);
+
   const loadDashboard = useCallback(() => {
     setFading(true);
-    setTimeout(() => setScene("dashboard"), 700);
+    setTimeout(() => {
+      setScene("dashboard");
+      setFading(false);
+    }, 700);
   }, []);
+
+  if (scene === "dashboard") {
+    return <Dashboard />;
+  }
 
   const frozen = scene === "dialogue";
 
   return (
     <div className="dark fixed inset-0 overflow-hidden bg-background text-foreground">
-      {/* Desktop wallpaper: Hackathon image + ambient lighting overlay */}
+      {/* Desktop wallpaper: Hackathon image */}
       <div
-        className="desktop-wallpaper absolute inset-0 bg-cover bg-center"
-        style={{ backgroundImage: `url(${hackathonWallpaper.url})` }}
+        className="desktop-wallpaper absolute inset-0 bg-cover bg-center bg-no-repeat"
+        style={{
+          backgroundImage: `url(${hackathonWallpaper})`,
+          backgroundSize: "cover",
+          backgroundPosition: "center",
+        }}
         aria-hidden
       />
-      <div className="desktop-glow absolute inset-0" aria-hidden />
+      <div className="desktop-glow absolute inset-0 opacity-40 pointer-events-none" aria-hidden />
 
       {/* Top bar */}
       <div className="absolute inset-x-0 top-0 flex items-center justify-between border-b border-border/40 bg-card/40 px-5 py-2.5 backdrop-blur-md">
@@ -159,7 +189,16 @@ function Index() {
             WINDGOES V4.2
           </span>
         </div>
-        <Clock />
+        <div className="flex items-center gap-3">
+          <button
+            onClick={() => setScene("dashboard")}
+            className="flex items-center gap-1.5 rounded-md border border-red-500/40 bg-red-950/40 px-2.5 py-1 font-mono text-[11px] font-semibold text-red-400 hover:bg-red-900/50 hover:text-red-200 transition-colors cursor-pointer"
+            title="Fast switch to GIG//PORTAL Dashboard"
+          >
+            <span>⚡ Gig Portal</span>
+          </button>
+          <Clock />
+        </div>
       </div>
 
       {/* Desktop icons */}
@@ -238,10 +277,15 @@ function Index() {
         </div>
       )}
 
-      {/* Scene 5: shady neon ad */}
+      {/* Scene 5: shady neon ad & second dialogue */}
       {scene === "ad" && (
         <div className="absolute inset-0 flex items-center justify-center bg-background/60 backdrop-blur-sm animate-fade-in">
-          <div className="ad-flash relative mx-4 w-full max-w-md rounded-2xl border-2 border-neon bg-card p-8 text-center">
+          {/* Dim background slightly when second dialogue is active to keep focus */}
+          {showAdDialogue && (
+            <div className="absolute inset-0 bg-black/45 backdrop-blur-[2px] transition-opacity duration-300 z-20 pointer-events-none" />
+          )}
+
+          <div className="ad-flash relative mx-4 w-full max-w-md rounded-2xl border-2 border-neon bg-card p-8 text-center z-10">
             <span className="absolute -top-3 left-1/2 -translate-x-1/2 rounded-full bg-neon px-3 py-0.5 font-mono text-[10px] font-bold tracking-widest text-neon-foreground uppercase">
               Sponsored
             </span>
@@ -254,26 +298,42 @@ function Index() {
             </p>
             <button
               onClick={loadDashboard}
-              className="mt-6 w-full rounded-xl bg-neon py-3 text-sm font-black tracking-widest text-neon-foreground uppercase transition-transform hover:scale-[1.03] active:scale-95"
+              disabled={showAdDialogue}
+              className={`mt-6 w-full rounded-xl bg-neon py-3 text-sm font-black tracking-widest text-neon-foreground uppercase transition-transform hover:scale-[1.03] active:scale-95 cursor-pointer ${
+                showAdDialogue ? "opacity-60 pointer-events-none" : ""
+              }`}
             >
-              Enter Gig Portal
+              ENTER GIG PORTAL
             </button>
             <p className="mt-3 font-mono text-[10px] text-muted-foreground">
               * definitely not a scam * limited slots: 3 left *
             </p>
           </div>
+
+          {/* New narrative dialogue reaction 1s after ad appears */}
+          {showAdDialogue && (
+            <div className="absolute inset-x-4 bottom-8 z-30 mx-auto max-w-2xl animate-fade-in">
+              <div className="rounded-2xl border border-border/70 bg-popover/95 p-5 shadow-2xl backdrop-blur-xl">
+                <span className="inline-block rounded-md bg-primary/15 px-2.5 py-1 font-mono text-[11px] tracking-wider text-primary uppercase">
+                  You (4th Year Engineering Student)
+                </span>
+                <p className="mt-3 text-lg leading-relaxed text-foreground">
+                  "thats a shady ai generated ad... why not click it!! ^~^"
+                </p>
+                <div className="mt-4 flex justify-end">
+                  <button
+                    onClick={() => setShowAdDialogue(false)}
+                    className="rounded-lg bg-primary px-5 py-2 text-sm font-semibold text-primary-foreground transition-transform hover:scale-105 cursor-pointer"
+                  >
+                    Next →
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
         </div>
       )}
 
-      {/* Scene 6: dashboard placeholder */}
-      {scene === "dashboard" && (
-        <div className="absolute inset-0 flex flex-col items-center justify-center gap-4 animate-fade-in">
-          <div className="h-3 w-3 animate-ping rounded-full bg-accent" />
-          <p className="font-mono text-sm tracking-[0.3em] text-muted-foreground uppercase">
-            loadDashboard() — to be continued
-          </p>
-        </div>
-      )}
 
       {/* Fade-out overlay */}
       <div
