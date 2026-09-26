@@ -7,6 +7,7 @@ import { PoliticianGame } from "@/components/PoliticianGame";
 import AIInterviewGame from "@/games/ai-interview/AIInterviewGame";
 import TheTypoExorcist from "@/games/typo-exorcist/TheTypoExorcist";
 import CybersecurityGame from "@/games/rogue-ai/CybersecurityGame";
+import FakeNewsGame from "@/games/fake-news/FakeNewsGame";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -189,6 +190,111 @@ function Index() {
   const [desktopModal, setDesktopModal] = useState<{ title: string; content: string } | null>(null);
   const soundPlayed = useRef(false);
 
+  // Global Debt, Savings & Trophies State
+  const [debt, setDebt] = useState(50000);
+  const [savings, setSavings] = useState(0);
+  const [gigsCompleted, setGigsCompleted] = useState(0);
+  const [trophies, setTrophies] = useState([
+    {
+      id: "debt_slayer",
+      title: "Debt Slayer",
+      description: "Clear all $50,000 debt ($0 remaining)",
+      icon: "trophy",
+      unlocked: false,
+    },
+    {
+      id: "savings_tycoon",
+      title: "Savings Tycoon",
+      description: "Accumulate $5,000+ in savings",
+      icon: "trophy",
+      unlocked: false,
+    },
+    {
+      id: "politician_win",
+      title: "Political Mastermind",
+      description: "Win the BAP election campaign",
+      icon: "trophy",
+      unlocked: false,
+    },
+    {
+      id: "tabloid_mogul",
+      title: "Tabloid Mogul",
+      description: "Earn $2,500+ in Fake News broadcasts",
+      icon: "trophy",
+      unlocked: false,
+    },
+    {
+      id: "exorcist_master",
+      title: "Master Exorcist",
+      description: "Defeat spirits in Typo Exorcist",
+      icon: "trophy",
+      unlocked: false,
+    },
+    {
+      id: "gig_veteran",
+      title: "Gig Veteran",
+      description: "Complete 3+ gigs from the job board",
+      icon: "trophy",
+      unlocked: false,
+    },
+  ]);
+
+  const handleEarnMoney = useCallback((rawAmount: number | unknown, trophyToUnlock?: string) => {
+    const amount = typeof rawAmount === "number" && !isNaN(rawAmount) ? rawAmount : 3500;
+    setDebt((prevDebt) => {
+      const currentDebt = typeof prevDebt === "number" && !isNaN(prevDebt) ? prevDebt : 50000;
+      if (currentDebt > 0) {
+        const leftover = amount - currentDebt;
+        if (leftover >= 0) {
+          setSavings((s) => (typeof s === "number" && !isNaN(s) ? s : 0) + leftover);
+          return 0;
+        } else {
+          return currentDebt - amount;
+        }
+      } else {
+        setSavings((s) => (typeof s === "number" && !isNaN(s) ? s : 0) + amount);
+        return 0;
+      }
+    });
+
+    setGigsCompleted((g) => {
+      const nextGigs = (g || 0) + 1;
+      if (nextGigs >= 3) {
+        setTrophies((ts) => ts.map((t) => (t.id === "gig_veteran" ? { ...t, unlocked: true } : t)));
+      }
+      return nextGigs;
+    });
+
+    if (trophyToUnlock) {
+      setTrophies((ts) => ts.map((t) => (t.id === trophyToUnlock ? { ...t, unlocked: true } : t)));
+    }
+  }, []);
+
+  useEffect(() => {
+    setTrophies((ts) =>
+      ts.map((t) => {
+        if (t.id === "debt_slayer" && debt === 0) return { ...t, unlocked: true };
+        if (t.id === "savings_tycoon" && savings >= 5000) return { ...t, unlocked: true };
+        return t;
+      }),
+    );
+  }, [debt, savings]);
+
+  const handleAcceptGig = useCallback((jobId: string) => {
+    // Charge $250 entry fee (cost of doing business)
+    setSavings((s) => {
+      const currentSavings = typeof s === "number" && !isNaN(s) ? s : 0;
+      if (currentSavings >= 250) {
+        return currentSavings - 250;
+      } else {
+        const remainder = 250 - currentSavings;
+        setDebt((d) => (typeof d === "number" && !isNaN(d) ? d : 50000) + remainder);
+        return 0;
+      }
+    });
+    setSelectedGig(jobId);
+  }, []);
+
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     if (params.get("scene") === "dashboard") {
@@ -237,32 +343,68 @@ function Index() {
 
   if (scene === "dashboard") {
     if (selectedGig === "politician") {
-      return <PoliticianGame debt={50000} onComplete={() => setSelectedGig(null)} />;
+      return (
+        <PoliticianGame
+          debt={debt}
+          onComplete={() => {
+            handleEarnMoney(10000, "politician_win");
+            setSelectedGig(null);
+          }}
+        />
+      );
+    }
+    if (selectedGig === "fake-news-anchor") {
+      return (
+        <FakeNewsGame
+          debt={debt}
+          onExit={(earned = 3500) => {
+            handleEarnMoney(earned, "tabloid_mogul");
+            setSelectedGig(null);
+          }}
+        />
+      );
     }
     if (selectedGig === "technical-interview") {
       return (
         <AIInterviewGame
-          debt={50000}
-          onComplete={() => setSelectedGig(null)}
+          debt={debt}
+          onComplete={() => {
+            handleEarnMoney(5000);
+            setSelectedGig(null);
+          }}
           onBackToDashboard={() => setSelectedGig(null)}
         />
       );
     }
     if (selectedGig === "exorcist") {
-      return <TheTypoExorcist onExit={() => setSelectedGig(null)} />;
+      return (
+        <TheTypoExorcist
+          debt={debt}
+          onExit={(earned = 3000) => {
+            handleEarnMoney(earned, "exorcist_master");
+            setSelectedGig(null);
+          }}
+        />
+      );
     }
     if (selectedGig === "cybersecurity") {
       return (
         <CybersecurityGame
-          debt={50000}
-          onComplete={() => setSelectedGig(null)}
+          debt={debt}
+          onComplete={() => {
+            handleEarnMoney(5000);
+            setSelectedGig(null);
+          }}
           onExit={() => setSelectedGig(null)}
         />
       );
     }
     return (
       <Dashboard
-        onAcceptGig={(jobId) => setSelectedGig(jobId)}
+        debt={debt}
+        savings={savings}
+        trophies={trophies}
+        onAcceptGig={handleAcceptGig}
         onBackToDesktop={() => setScene("desktop")}
       />
     );
