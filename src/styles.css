@@ -42,6 +42,8 @@
   --color-accent-foreground: var(--accent-foreground);
   --color-destructive: var(--destructive);
   --color-destructive-foreground: var(--destructive-foreground);
+  --color-neon: var(--neon);
+  --color-neon-foreground: var(--neon-foreground);
   --color-border: var(--border);
   --color-input: var(--input);
   --color-ring: var(--ring);
@@ -95,6 +97,8 @@
   --sidebar-accent-foreground: oklch(0.208 0.042 265.755);
   --sidebar-border: oklch(0.929 0.013 255.508);
   --sidebar-ring: oklch(0.704 0.04 256.788);
+  --neon: oklch(0.87 0.29 142);
+  --neon-foreground: oklch(0.15 0.05 150);
 }
 
 .dark {
@@ -130,6 +134,8 @@
   --sidebar-accent-foreground: oklch(0.984 0.003 247.858);
   --sidebar-border: oklch(1 0 0 / 10%);
   --sidebar-ring: oklch(0.551 0.027 264.364);
+  --neon: oklch(0.87 0.29 142);
+  --neon-foreground: oklch(0.15 0.05 150);
 }
 
 @layer base {
@@ -141,4 +147,46 @@
     background-color: var(--color-background);
     color: var(--color-foreground);
   }
+}
+
+/* GIG//PORTAL story scene effects */
+.desktop-grid {
+  background-image:
+    linear-gradient(oklch(1 0 0 / 3%) 1px, transparent 1px),
+    linear-gradient(90deg, oklch(1 0 0 / 3%) 1px, transparent 1px);
+  background-size: 48px 48px;
+}
+
+.desktop-glow {
+  background:
+    radial-gradient(ellipse 60% 45% at 20% 10%, oklch(0.488 0.243 264.376 / 12%), transparent),
+    radial-gradient(ellipse 50% 40% at 85% 90%, oklch(0.696 0.17 162.48 / 8%), transparent);
+}
+
+@keyframes toast-pulse {
+  0%, 100% {
+    box-shadow: 0 0 30px -5px var(--primary);
+    transform: scale(1);
+  }
+  50% {
+    box-shadow: 0 0 45px -2px var(--primary);
+    transform: scale(1.02);
+  }
+}
+
+.toast-pulse {
+  animation: toast-pulse 1.6s ease-in-out infinite;
+}
+
+@keyframes ad-flash {
+  0%, 100% {
+    box-shadow: 0 0 25px -4px var(--neon), 0 0 60px -10px var(--neon);
+  }
+  50% {
+    box-shadow: 0 0 50px 0 var(--neon), 0 0 100px -10px var(--neon);
+  }
+}
+
+.ad-flash {
+  animation: ad-flash 0.9s ease-in-out infinite;
 }
