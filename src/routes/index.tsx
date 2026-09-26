@@ -122,7 +122,7 @@ function Index() {
         <div className="flex items-center gap-2">
           <div className="h-2.5 w-2.5 rounded-full bg-primary shadow-[0_0_10px_var(--primary)]" />
           <span className="font-mono text-xs tracking-[0.25em] text-foreground/80 uppercase">
-            SikarwarOS <span className="text-muted-foreground">v4.2</span>
+            WINDGOES V4.2
           </span>
         </div>
         <Clock />
