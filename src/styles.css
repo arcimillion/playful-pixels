@@ -97,6 +97,8 @@
   --sidebar-accent-foreground: oklch(0.208 0.042 265.755);
   --sidebar-border: oklch(0.929 0.013 255.508);
   --sidebar-ring: oklch(0.704 0.04 256.788);
+  --neon: oklch(0.87 0.29 142);
+  --neon-foreground: oklch(0.15 0.05 150);
 }
 
 .dark {
@@ -178,10 +180,10 @@
 
 @keyframes ad-flash {
   0%, 100% {
-    box-shadow: 0 0 25px -4px var(--accent), 0 0 60px -10px var(--accent);
+    box-shadow: 0 0 25px -4px var(--neon), 0 0 60px -10px var(--neon);
   }
   50% {
-    box-shadow: 0 0 50px 0 var(--accent), 0 0 100px -10px var(--accent);
+    box-shadow: 0 0 50px 0 var(--neon), 0 0 100px -10px var(--neon);
   }
 }
 

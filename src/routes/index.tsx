@@ -203,20 +203,20 @@ function Index() {
       {/* Scene 5: shady neon ad */}
       {scene === "ad" && (
         <div className="absolute inset-0 flex items-center justify-center bg-background/60 backdrop-blur-sm animate-fade-in">
-          <div className="ad-flash relative mx-4 w-full max-w-md rounded-2xl border-2 border-accent bg-card p-8 text-center">
-            <span className="absolute -top-3 left-1/2 -translate-x-1/2 rounded-full bg-accent px-3 py-0.5 font-mono text-[10px] font-bold tracking-widest text-accent-foreground uppercase">
+          <div className="ad-flash relative mx-4 w-full max-w-md rounded-2xl border-2 border-neon bg-card p-8 text-center">
+            <span className="absolute -top-3 left-1/2 -translate-x-1/2 rounded-full bg-neon px-3 py-0.5 font-mono text-[10px] font-bold tracking-widest text-neon-foreground uppercase">
               Sponsored
             </span>
-            <h2 className="text-2xl font-black tracking-tight text-accent drop-shadow-[0_0_12px_var(--accent)]">
+            <h2 className="text-2xl font-black tracking-tight text-neon drop-shadow-[0_0_12px_var(--neon)]">
               ⚡ NO CODING REQUIRED! ⚡
             </h2>
             <p className="mt-3 text-sm leading-relaxed text-foreground/90">
               AI taking your job? Earn fast cash with{" "}
-              <span className="font-bold text-accent">100% human-only gigs!</span>
+              <span className="font-bold text-neon">100% human-only gigs!</span>
             </p>
             <button
               onClick={loadDashboard}
-              className="mt-6 w-full rounded-xl bg-accent py-3 text-sm font-black tracking-widest text-accent-foreground uppercase transition-transform hover:scale-[1.03] active:scale-95"
+              className="mt-6 w-full rounded-xl bg-neon py-3 text-sm font-black tracking-widest text-neon-foreground uppercase transition-transform hover:scale-[1.03] active:scale-95"
             >
               Enter Gig Portal
             </button>
