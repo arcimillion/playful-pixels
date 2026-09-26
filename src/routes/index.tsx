@@ -41,6 +41,33 @@ const REJECTION_EMAILS = [
   { sender: "recruitment@voidworks.dev", subject: "Thank you for applying", preview: "Your profile was impressive, but our AI scored itself higher...", time: "Sat" },
 ];
 
+const DESKTOP_ICONS = [
+  {
+    label: "Inbox",
+    Icon: Mail,
+    tone: "text-cyan-400",
+    glow: "drop-shadow-[0_0_8px_rgba(34,211,238,0.75)]",
+  },
+  {
+    label: "Resume.pdf",
+    Icon: FileText,
+    tone: "text-amber-400",
+    glow: "drop-shadow-[0_0_8px_rgba(251,191,36,0.75)]",
+  },
+  {
+    label: "Projects",
+    Icon: FolderCode,
+    tone: "text-cyan-300",
+    glow: "drop-shadow-[0_0_8px_rgba(103,232,249,0.75)]",
+  },
+  {
+    label: "Trash",
+    Icon: Trash2,
+    tone: "text-slate-400",
+    glow: "drop-shadow-[0_0_6px_rgba(148,163,184,0.5)]",
+  },
+];
+
 function playNotificationSound() {
   try {
     const Ctx = window.AudioContext ?? (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext;
@@ -134,7 +161,7 @@ function Index() {
         {DESKTOP_ICONS.map(({ label, Icon, tone, glow }) => (
           <div key={label} className="group flex w-16 flex-col items-center gap-1.5">
             <div
-              className={`flex h-11 w-11 cursor-pointer items-center justify-center rounded-xl border border-border/60 bg-slate-800/60 shadow-[inset_0_1px_0_rgba(255,255,255,0.06)] backdrop-blur transition-all duration-200 hover:scale-105 hover:border-cyan-500/50 hover:shadow-[0_0_20px_-2px_rgba(34,211,238,0.4),inset_0_1px_0_rgba(255,255,255,0.08)] ${group ? "" : ""}`}
+              className="flex h-11 w-11 cursor-pointer items-center justify-center rounded-xl border border-border/60 bg-slate-800/60 shadow-[inset_0_1px_0_rgba(255,255,255,0.06)] backdrop-blur transition-all duration-200 hover:scale-105 hover:border-cyan-500/50 hover:shadow-[0_0_20px_-2px_rgba(34,211,238,0.4),inset_0_1px_0_rgba(255,255,255,0.08)]"
             >
               <Icon size={20} strokeWidth={1.75} className={`${tone} ${glow}`} />
             </div>
