@@ -1,6 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { FileText, FolderCode, Mail, Trash2 } from "lucide-react";
 import { useCallback, useEffect, useRef, useState } from "react";
+import hackathonWallpaper from "@/assets/Hackathon.png.asset.json";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -125,10 +126,11 @@ function Index() {
     return () => clearTimeout(id);
   }, [scene]);
 
-  // Scene 4: dialogue appears 1s after inbox opens
+  // Scene 4: dialogue appears 4.5s after inbox opens, so the wall of
+  // rejections gets time to land before the character reacts
   useEffect(() => {
     if (scene !== "inbox") return;
-    const id = setTimeout(() => setScene("dialogue"), 1000);
+    const id = setTimeout(() => setScene("dialogue"), 4500);
     return () => clearTimeout(id);
   }, [scene]);
 
@@ -141,8 +143,12 @@ function Index() {
 
   return (
     <div className="dark fixed inset-0 overflow-hidden bg-background text-foreground">
-      {/* Desktop wallpaper texture */}
-      <div className="desktop-grid absolute inset-0" aria-hidden />
+      {/* Desktop wallpaper: Hackathon image + ambient lighting overlay */}
+      <div
+        className="desktop-wallpaper absolute inset-0 bg-cover bg-center"
+        style={{ backgroundImage: `url(${hackathonWallpaper.url})` }}
+        aria-hidden
+      />
       <div className="desktop-glow absolute inset-0" aria-hidden />
 
       {/* Top bar */}
@@ -159,13 +165,13 @@ function Index() {
       {/* Desktop icons */}
       <div className="absolute top-16 left-6 flex flex-col gap-6">
         {DESKTOP_ICONS.map(({ label, Icon, tone, glow }) => (
-          <div key={label} className="group flex w-16 flex-col items-center gap-1.5">
+          <div key={label} className="group flex w-24 flex-col items-center gap-1.5">
             <div
-              className="flex h-11 w-11 cursor-pointer items-center justify-center rounded-xl border border-border/60 bg-slate-800/60 shadow-[inset_0_1px_0_rgba(255,255,255,0.06)] backdrop-blur transition-all duration-200 hover:scale-105 hover:border-cyan-500/50 hover:shadow-[0_0_20px_-2px_rgba(34,211,238,0.4),inset_0_1px_0_rgba(255,255,255,0.08)]"
+              className="flex h-24 w-24 cursor-pointer items-center justify-center rounded-2xl border border-border/60 bg-slate-800/60 shadow-[inset_0_1px_0_rgba(255,255,255,0.06)] backdrop-blur transition-all duration-200 hover:scale-105 hover:border-cyan-500/50 hover:shadow-[0_0_20px_-2px_rgba(34,211,238,0.4),inset_0_1px_0_rgba(255,255,255,0.08)]"
             >
-              <Icon size={20} strokeWidth={1.75} className={`${tone} ${glow}`} />
+              <Icon size={48} strokeWidth={1.75} className={`${tone} ${glow}`} />
             </div>
-            <span className="text-center text-[10px] leading-tight text-foreground/70 transition-colors group-hover:text-cyan-300">
+            <span className="text-center text-sm leading-tight text-foreground/70 transition-colors group-hover:text-cyan-300">
               {label}
             </span>
           </div>
