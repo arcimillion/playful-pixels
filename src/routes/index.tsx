@@ -2,11 +2,19 @@ import { createFileRoute } from "@tanstack/react-router";
 import { FileText, FolderCode, Mail, Trash2 } from "lucide-react";
 import { useCallback, useEffect, useRef, useState } from "react";
 import hackathonWallpaper from "@/assets/Hackathon.png";
-import { Dashboard } from "@/components/Dashboard";
+import {
+  Dashboard,
+  createUpbeatLofiAudioUrl,
+  createRainAudioUrl,
+  createThunderAudioUrl,
+} from "@/components/Dashboard";
+import { ShopPage } from "@/components/ShopPage";
+import { CasinoPage } from "@/components/CasinoPage";
 import { PoliticianGame } from "@/components/PoliticianGame";
 import AIInterviewGame from "@/games/ai-interview/AIInterviewGame";
 import TheTypoExorcist from "@/games/typo-exorcist/TheTypoExorcist";
 import CybersecurityGame from "@/games/rogue-ai/CybersecurityGame";
+import CyberDefenseTDS from "@/games/cyber-defense/CyberDefenseTDS";
 import FakeNewsGame from "@/games/fake-news/FakeNewsGame";
 
 export const Route = createFileRoute("/")({
@@ -190,15 +198,187 @@ function Index() {
   const [desktopModal, setDesktopModal] = useState<{ title: string; content: string } | null>(null);
   const soundPlayed = useRef(false);
 
-  // Global Debt, Savings & Trophies State
-  const [debt, setDebt] = useState(50000);
+  // Global Debt, Savings, Lifestyle Shop & Trophies State
+  const [currentView, setCurrentView] = useState<"dashboard" | "shop" | "casino">("dashboard");
+  const [debt, setDebt] = useState(30000);
   const [savings, setSavings] = useState(0);
+  const [completedJobsCount, setCompletedJobsCount] = useState(0);
   const [gigsCompleted, setGigsCompleted] = useState(0);
+  const [isFeverActive, setIsFeverActive] = useState(false);
+  const [hasGym, setHasGym] = useState(false);
+  const [hasBubbles, setHasBubbles] = useState(false);
+  const [hasClickSound, setHasClickSound] = useState(false);
+  const [hasCustomButtons, setHasCustomButtons] = useState(false);
+  const [hasVignette, setHasVignette] = useState(false);
+  const [hasPinwheel, setHasPinwheel] = useState(false);
+  const [hasRainAudio, setHasRainAudio] = useState(false);
+  const [isPlayingRain, setIsPlayingRain] = useState(false);
+  const [hasThunderAudio, setHasThunderAudio] = useState(false);
+  const [isPlayingThunder, setIsPlayingThunder] = useState(false);
+  const [hasBackgroundAudio, setHasBackgroundAudio] = useState(false);
+  const [hasHeadphones, setHasHeadphones] = useState(false);
+  const [hasLofiMusic, setHasLofiMusic] = useState(false);
+  const [hasSeenFreedomCutscene, setHasSeenFreedomCutscene] = useState(false);
+  const [isMusicUnlocked, setIsMusicUnlocked] = useState(false);
+  const [currentTheme, setCurrentTheme] = useState("dark");
+  const [hasVipCasinoPass, setHasVipCasinoPass] = useState(false);
+  const [hasGoldenResume, setHasGoldenResume] = useState(false);
+  const [hasNeonTheme, setHasNeonTheme] = useState(false);
+  const [hasStarryNight, setHasStarryNight] = useState(false);
+  const [hasCoffeeMachine, setHasCoffeeMachine] = useState(false);
+
+  // Passive income generator from Coffee Machine perk (+$100 / 5s)
+  useEffect(() => {
+    if (!hasCoffeeMachine) return;
+    const interval = setInterval(() => {
+      setSavings((s) => (typeof s === "number" && !isNaN(s) ? s : 0) + 100);
+    }, 5000);
+    return () => clearInterval(interval);
+  }, [hasCoffeeMachine]);
+
+  const bgAudioRef = useRef<HTMLAudioElement | null>(null);
+  const rainAudioRef = useRef<HTMLAudioElement | null>(null);
+  const thunderAudioRef = useRef<HTMLAudioElement | null>(null);
+
+  useEffect(() => {
+    const url = createUpbeatLofiAudioUrl();
+    const audio = new Audio(url);
+    audio.loop = true;
+    bgAudioRef.current = audio;
+    return () => {
+      audio.pause();
+      if (url) URL.revokeObjectURL(url);
+    };
+  }, []);
+
+  useEffect(() => {
+    const rainUrl = createRainAudioUrl();
+    const rainAudio = new Audio(rainUrl);
+    rainAudio.loop = true;
+    rainAudioRef.current = rainAudio;
+    return () => {
+      rainAudio.pause();
+      if (rainUrl) URL.revokeObjectURL(rainUrl);
+    };
+  }, []);
+
+  useEffect(() => {
+    const thunderUrl = createThunderAudioUrl();
+    const thunderAudio = new Audio(thunderUrl);
+    thunderAudio.loop = true;
+    thunderAudioRef.current = thunderAudio;
+    return () => {
+      thunderAudio.pause();
+      if (thunderUrl) URL.revokeObjectURL(thunderUrl);
+    };
+  }, []);
+
+  const playBackgroundAudio = useCallback(() => {
+    try {
+      if (!bgAudioRef.current) {
+        const url = createUpbeatLofiAudioUrl();
+        const audio = new Audio(url);
+        audio.loop = true;
+        bgAudioRef.current = audio;
+      }
+      bgAudioRef.current.volume = 0.8;
+      const res = bgAudioRef.current.play();
+      if (res && res.catch) {
+        res.catch(() => {
+          const fresh = new Audio(createUpbeatLofiAudioUrl());
+          fresh.loop = true;
+          fresh.volume = 0.8;
+          fresh.play().catch(() => {});
+          bgAudioRef.current = fresh;
+        });
+      }
+    } catch {
+      // audio error fallback
+    }
+  }, []);
+
+  const pauseBackgroundAudio = useCallback(() => {
+    if (bgAudioRef.current) {
+      bgAudioRef.current.pause();
+    }
+  }, []);
+
+  const playRainAudio = useCallback(() => {
+    try {
+      if (!rainAudioRef.current) {
+        const url = createRainAudioUrl();
+        const audio = new Audio(url);
+        audio.loop = true;
+        rainAudioRef.current = audio;
+      }
+      rainAudioRef.current.volume = 0.85;
+      const res = rainAudioRef.current.play();
+      if (res && res.catch) {
+        res.catch(() => {
+          const fresh = new Audio(createRainAudioUrl());
+          fresh.loop = true;
+          fresh.volume = 0.85;
+          fresh.play().catch(() => {});
+          rainAudioRef.current = fresh;
+        });
+      }
+      setIsPlayingRain(true);
+    } catch {
+      setIsPlayingRain(true);
+    }
+  }, []);
+
+  const pauseRainAudio = useCallback(() => {
+    if (rainAudioRef.current) {
+      rainAudioRef.current.pause();
+      setIsPlayingRain(false);
+    }
+  }, []);
+
+  const playThunderAudio = useCallback(() => {
+    try {
+      if (!thunderAudioRef.current) {
+        const url = createThunderAudioUrl();
+        const audio = new Audio(url);
+        audio.loop = true;
+        thunderAudioRef.current = audio;
+      }
+      thunderAudioRef.current.volume = 0.85;
+      const res = thunderAudioRef.current.play();
+      if (res && res.catch) {
+        res.catch(() => {
+          const fresh = new Audio(createThunderAudioUrl());
+          fresh.loop = true;
+          fresh.volume = 0.85;
+          fresh.play().catch(() => {});
+          thunderAudioRef.current = fresh;
+        });
+      }
+      setIsPlayingThunder(true);
+    } catch {
+      setIsPlayingThunder(true);
+    }
+  }, []);
+
+  const pauseThunderAudio = useCallback(() => {
+    if (thunderAudioRef.current) {
+      thunderAudioRef.current.pause();
+      setIsPlayingThunder(false);
+    }
+  }, []);
+
   const [trophies, setTrophies] = useState([
     {
       id: "debt_slayer",
       title: "Debt Slayer",
-      description: "Clear all $50,000 debt ($0 remaining)",
+      description: "Clear all $30,000 debt ($0 remaining)",
+      icon: "trophy",
+      unlocked: false,
+    },
+    {
+      id: "halfway_there",
+      title: "Freedom Horizon",
+      description: "Reduce total debt below $15,000",
       icon: "trophy",
       unlocked: false,
     },
@@ -210,85 +390,230 @@ function Index() {
       unlocked: false,
     },
     {
+      id: "high_roller",
+      title: "Mogul Investor",
+      description: "Accumulate $15,000+ in savings",
+      icon: "trophy",
+      unlocked: false,
+    },
+    {
       id: "politician_win",
       title: "Political Mastermind",
-      description: "Win the BAP election campaign",
+      description: "Step in and win the BAP election campaign",
       icon: "trophy",
       unlocked: false,
     },
     {
       id: "tabloid_mogul",
       title: "Tabloid Mogul",
-      description: "Earn $2,500+ in Fake News broadcasts",
+      description: "Earn cash from Fake News Anchor clickbait broadcasts",
       icon: "trophy",
       unlocked: false,
     },
     {
       id: "exorcist_master",
       title: "Master Exorcist",
-      description: "Defeat spirits in Typo Exorcist",
+      description: "Defeat demonic spirits in Typo Exorcist",
+      icon: "trophy",
+      unlocked: false,
+    },
+    {
+      id: "tech_interview_ace",
+      title: "LeetCode Conqueror",
+      description: "Pass the AI Interrogator technical job interview",
+      icon: "trophy",
+      unlocked: false,
+    },
+    {
+      id: "cyber_defender",
+      title: "Rogue AI Sentinel",
+      description: "Defend the motherboard grid in Cybersecurity Defense",
       icon: "trophy",
       unlocked: false,
     },
     {
       id: "gig_veteran",
       title: "Gig Veteran",
-      description: "Complete 3+ gigs from the job board",
+      description: "Complete 3+ gigs from the human job portal",
+      icon: "trophy",
+      unlocked: false,
+    },
+    {
+      id: "gig_workaholic",
+      title: "Gig Workaholic",
+      description: "Complete 7+ gigs from the human job portal",
+      icon: "trophy",
+      unlocked: false,
+    },
+    {
+      id: "gym_rat",
+      title: "Health Connoisseur",
+      description: "Purchase a Gym Membership to permanently block fever attacks",
+      icon: "trophy",
+      unlocked: false,
+    },
+    {
+      id: "fever_survived",
+      title: "Burnout Survivor",
+      description: "Recover from an overwork fever attack",
+      icon: "trophy",
+      unlocked: false,
+    },
+    {
+      id: "audiophile",
+      title: "Soundscape Enthusiast",
+      description: "Unlock any ambient sound upgrade in the marketplace",
+      icon: "trophy",
+      unlocked: false,
+    },
+    {
+      id: "maestro_of_sound",
+      title: "Master Audio Director",
+      description: "Own all 3 ambient sound modules (Lo-Fi, Rain, and Thunder)",
+      icon: "trophy",
+      unlocked: false,
+    },
+    {
+      id: "tactical_ui",
+      title: "Retro Aesthetic",
+      description: "Unlock the Custom Button UI upgrade",
+      icon: "trophy",
+      unlocked: false,
+    },
+    {
+      id: "pinwheel_enthusiast",
+      title: "Wind Power",
+      description: "Unlock Pinwheel & Pinwheel background effect",
+      icon: "trophy",
+      unlocked: false,
+    },
+    {
+      id: "freedom_cutscene",
+      title: "Free at Last",
+      description: "Witness the postgame freedom milestone cutscene",
       icon: "trophy",
       unlocked: false,
     },
   ]);
 
-  const handleEarnMoney = useCallback((rawAmount: number | unknown, trophyToUnlock?: string) => {
-    const amount = typeof rawAmount === "number" && !isNaN(rawAmount) ? rawAmount : 3500;
-    setDebt((prevDebt) => {
-      const currentDebt = typeof prevDebt === "number" && !isNaN(prevDebt) ? prevDebt : 50000;
-      if (currentDebt > 0) {
-        const leftover = amount - currentDebt;
-        if (leftover >= 0) {
-          setSavings((s) => (typeof s === "number" && !isNaN(s) ? s : 0) + leftover);
-          return 0;
-        } else {
-          return currentDebt - amount;
-        }
+  const triggerFeverEvent = useCallback(() => {
+    setIsFeverActive(true);
+    setSavings((s) => {
+      const currentSavings = typeof s === "number" && !isNaN(s) ? s : 0;
+      if (currentSavings >= 200) {
+        return currentSavings - 200;
       } else {
-        setSavings((s) => (typeof s === "number" && !isNaN(s) ? s : 0) + amount);
+        const remainder = 200 - currentSavings;
+        setDebt((d) => (typeof d === "number" && !isNaN(d) ? d : 0) + remainder);
         return 0;
       }
     });
-
-    setGigsCompleted((g) => {
-      const nextGigs = (g || 0) + 1;
-      if (nextGigs >= 3) {
-        setTrophies((ts) => ts.map((t) => (t.id === "gig_veteran" ? { ...t, unlocked: true } : t)));
-      }
-      return nextGigs;
-    });
-
-    if (trophyToUnlock) {
-      setTrophies((ts) => ts.map((t) => (t.id === trophyToUnlock ? { ...t, unlocked: true } : t)));
-    }
   }, []);
+
+  const dismissFeverEvent = useCallback(() => {
+    setIsFeverActive(false);
+    setCompletedJobsCount(0);
+  }, []);
+
+  const handleEarnMoney = useCallback(
+    (rawAmount: number | unknown, trophyToUnlock?: string) => {
+      let amount = typeof rawAmount === "number" && !isNaN(rawAmount) ? rawAmount : 3500;
+      if (hasGoldenResume) {
+        amount = Math.round(amount * 1.5);
+      }
+      setDebt((prevDebt) => {
+        const currentDebt = typeof prevDebt === "number" && !isNaN(prevDebt) ? prevDebt : 30000;
+        if (currentDebt > 0) {
+          const leftover = amount - currentDebt;
+          if (leftover >= 0) {
+            setSavings((s) => (typeof s === "number" && !isNaN(s) ? s : 0) + leftover);
+            return 0;
+          } else {
+            return currentDebt - amount;
+          }
+        } else {
+          setSavings((s) => (typeof s === "number" && !isNaN(s) ? s : 0) + amount);
+          return 0;
+        }
+      });
+
+      // Check completed jobs count for Fever event (every 2 games)
+      setCompletedJobsCount((prev) => {
+        const nextCount = (prev || 0) + 1;
+        if (nextCount > 0 && nextCount % 2 === 0) {
+          if (hasGym) {
+            return 0;
+          } else {
+            triggerFeverEvent();
+            return nextCount;
+          }
+        }
+        return nextCount;
+      });
+
+      setGigsCompleted((g) => {
+        const nextGigs = (g || 0) + 1;
+        if (nextGigs >= 3) {
+          setTrophies((ts) =>
+            ts.map((t) => (t.id === "gig_veteran" ? { ...t, unlocked: true } : t)),
+          );
+        }
+        return nextGigs;
+      });
+
+      if (trophyToUnlock) {
+        setTrophies((ts) =>
+          ts.map((t) => (t.id === trophyToUnlock ? { ...t, unlocked: true } : t)),
+        );
+      }
+    },
+    [hasGym, triggerFeverEvent, hasGoldenResume],
+  );
 
   useEffect(() => {
     setTrophies((ts) =>
       ts.map((t) => {
         if (t.id === "debt_slayer" && debt === 0) return { ...t, unlocked: true };
+        if (t.id === "halfway_there" && debt <= 15000) return { ...t, unlocked: true };
         if (t.id === "savings_tycoon" && savings >= 5000) return { ...t, unlocked: true };
+        if (t.id === "high_roller" && savings >= 15000) return { ...t, unlocked: true };
+        if (t.id === "gym_rat" && hasGym) return { ...t, unlocked: true };
+        if (t.id === "fever_survived" && isFeverActive) return { ...t, unlocked: true };
+        if (t.id === "audiophile" && (hasBackgroundAudio || hasRainAudio || hasThunderAudio))
+          return { ...t, unlocked: true };
+        if (t.id === "maestro_of_sound" && hasBackgroundAudio && hasRainAudio && hasThunderAudio)
+          return { ...t, unlocked: true };
+        if (t.id === "tactical_ui" && hasCustomButtons) return { ...t, unlocked: true };
+        if (t.id === "pinwheel_enthusiast" && hasPinwheel) return { ...t, unlocked: true };
+        if (t.id === "freedom_cutscene" && hasSeenFreedomCutscene) return { ...t, unlocked: true };
+        if (t.id === "gig_veteran" && gigsCompleted >= 3) return { ...t, unlocked: true };
+        if (t.id === "gig_workaholic" && gigsCompleted >= 7) return { ...t, unlocked: true };
         return t;
       }),
     );
-  }, [debt, savings]);
+  }, [
+    debt,
+    savings,
+    hasGym,
+    isFeverActive,
+    hasBackgroundAudio,
+    hasRainAudio,
+    hasThunderAudio,
+    hasCustomButtons,
+    hasPinwheel,
+    hasSeenFreedomCutscene,
+    gigsCompleted,
+  ]);
 
   const handleAcceptGig = useCallback((jobId: string) => {
-    // Charge $250 entry fee (cost of doing business)
+    // Charge $200 entry fee (cost of doing business)
     setSavings((s) => {
       const currentSavings = typeof s === "number" && !isNaN(s) ? s : 0;
-      if (currentSavings >= 250) {
-        return currentSavings - 250;
+      if (currentSavings >= 200) {
+        return currentSavings - 200;
       } else {
-        const remainder = 250 - currentSavings;
-        setDebt((d) => (typeof d === "number" && !isNaN(d) ? d : 50000) + remainder);
+        const remainder = 200 - currentSavings;
+        setDebt((d) => (typeof d === "number" && !isNaN(d) ? d : 30000) + remainder);
         return 0;
       }
     });
@@ -341,6 +666,38 @@ function Index() {
     }, 700);
   }, []);
 
+  // Global click sound effect listener
+  useEffect(() => {
+    if (!hasClickSound) return;
+    const handleClick = (e: MouseEvent) => {
+      const target = e.target as HTMLElement | null;
+      if (target && target.closest("button, a, input, select, [role='button'], .cursor-pointer")) {
+        try {
+          const AudioCtx =
+            window.AudioContext ||
+            (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext;
+          if (!AudioCtx) return;
+          const ctx = new AudioCtx();
+          const osc = ctx.createOscillator();
+          const gain = ctx.createGain();
+          osc.type = "sine";
+          osc.frequency.setValueAtTime(1400, ctx.currentTime);
+          osc.frequency.exponentialRampToValueAtTime(320, ctx.currentTime + 0.025);
+          gain.gain.setValueAtTime(0.08, ctx.currentTime);
+          gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.025);
+          osc.connect(gain);
+          gain.connect(ctx.destination);
+          osc.start();
+          osc.stop(ctx.currentTime + 0.03);
+        } catch (err) {
+          void err;
+        }
+      }
+    };
+    window.addEventListener("click", handleClick, true);
+    return () => window.removeEventListener("click", handleClick, true);
+  }, [hasClickSound]);
+
   if (scene === "dashboard") {
     if (selectedGig === "politician") {
       return (
@@ -369,7 +726,7 @@ function Index() {
         <AIInterviewGame
           debt={debt}
           onComplete={() => {
-            handleEarnMoney(5000);
+            handleEarnMoney(5000, "tech_interview_ace");
             setSelectedGig(null);
           }}
           onBackToDashboard={() => setSelectedGig(null)}
@@ -389,31 +746,439 @@ function Index() {
     }
     if (selectedGig === "cybersecurity") {
       return (
-        <CybersecurityGame
+        <CyberDefenseTDS
           debt={debt}
           onComplete={() => {
-            handleEarnMoney(5000);
+            handleEarnMoney(5000, "cyber_defender");
             setSelectedGig(null);
           }}
           onExit={() => setSelectedGig(null)}
         />
       );
     }
-    return (
+    let viewContent = (
       <Dashboard
         debt={debt}
         savings={savings}
         trophies={trophies}
+        hasGym={hasGym}
+        setHasGym={setHasGym}
+        hasHeadphones={hasHeadphones}
+        setHasHeadphones={setHasHeadphones}
+        hasSeenFreedomCutscene={hasSeenFreedomCutscene}
+        setHasSeenFreedomCutscene={setHasSeenFreedomCutscene}
+        hasLofiMusic={hasLofiMusic || hasHeadphones}
+        setHasLofiMusic={(v) => {
+          setHasLofiMusic(v);
+          setHasHeadphones(v);
+        }}
+        isMusicUnlocked={hasLofiMusic || hasHeadphones || isMusicUnlocked}
+        setIsMusicUnlocked={(v) => {
+          setIsMusicUnlocked(v);
+          setHasLofiMusic(v);
+          setHasHeadphones(v);
+        }}
+        currentTheme={currentTheme}
+        setCurrentTheme={setCurrentTheme}
+        hasCoffeeMachine={hasCoffeeMachine}
+        hasGoldenResume={hasGoldenResume}
+        hasVipCasinoPass={hasVipCasinoPass}
+        setSavings={setSavings}
+        setDebt={setDebt}
+        isFeverActive={isFeverActive}
+        completedJobsCount={completedJobsCount}
+        onTriggerFever={triggerFeverEvent}
+        onDismissFever={dismissFeverEvent}
         onAcceptGig={handleAcceptGig}
         onBackToDesktop={() => setScene("desktop")}
+        onOpenShop={() => {
+          if (debt <= 0 && hasSeenFreedomCutscene) {
+            setCurrentView("shop");
+          }
+        }}
       />
+    );
+
+    if (currentView === "shop") {
+      viewContent = (
+        <ShopPage
+          savings={savings}
+          hasGym={hasGym}
+          hasBubbles={hasBubbles}
+          hasClickSound={hasClickSound}
+          hasCustomButtons={hasCustomButtons}
+          hasVignette={hasVignette}
+          hasPinwheel={hasPinwheel}
+          hasRainAudio={hasRainAudio}
+          hasThunderAudio={hasThunderAudio}
+          hasBackgroundAudio={hasBackgroundAudio}
+          hasVipCasinoPass={hasVipCasinoPass}
+          hasGoldenResume={hasGoldenResume}
+          hasNeonTheme={hasNeonTheme}
+          hasStarryNight={hasStarryNight}
+          hasCoffeeMachine={hasCoffeeMachine}
+          isPlayingAudio={isMusicUnlocked}
+          isPlayingRain={isPlayingRain}
+          isPlayingThunder={isPlayingThunder}
+          onBackToDashboard={() => setCurrentView("dashboard")}
+          onEnterCasino={() => setCurrentView("casino")}
+          onBuyGym={() => {
+            if (hasGym) return;
+            if (savings >= 500) {
+              setSavings((s) => s - 500);
+              setHasGym(true);
+            }
+          }}
+          onBuyBubbles={() => {
+            if (hasBubbles) return;
+            if (savings >= 250) {
+              setSavings((s) => s - 250);
+              setHasBubbles(true);
+            }
+          }}
+          onBuyClickSound={() => {
+            if (hasClickSound) return;
+            if (savings >= 400) {
+              setSavings((s) => s - 400);
+              setHasClickSound(true);
+            }
+          }}
+          onBuyCustomButtons={() => {
+            if (hasCustomButtons) return;
+            if (savings >= 750) {
+              setSavings((s) => s - 750);
+              setHasCustomButtons(true);
+            }
+          }}
+          onBuyPinwheel={() => {
+            if (hasPinwheel) return;
+            if (savings >= 850) {
+              setSavings((s) => s - 850);
+              setHasPinwheel(true);
+            }
+          }}
+          onBuyVignette={() => {
+            if (hasVignette) return;
+            if (savings >= 1000) {
+              setSavings((s) => s - 1000);
+              setHasVignette(true);
+            }
+          }}
+          onBuyRainAudio={() => {
+            if (hasRainAudio) {
+              if (isPlayingRain) pauseRainAudio();
+              else playRainAudio();
+              return;
+            }
+            if (savings >= 1200) {
+              setSavings((s) => s - 1200);
+              setHasRainAudio(true);
+              playRainAudio();
+            }
+          }}
+          onBuyBackgroundAudio={() => {
+            if (hasBackgroundAudio) {
+              if (isMusicUnlocked) {
+                pauseBackgroundAudio();
+                setIsMusicUnlocked(false);
+              } else {
+                playBackgroundAudio();
+                setIsMusicUnlocked(true);
+              }
+              return;
+            }
+            if (savings >= 1500) {
+              setSavings((s) => s - 1500);
+              setHasBackgroundAudio(true);
+              setHasLofiMusic(true);
+              setHasHeadphones(true);
+              setIsMusicUnlocked(true);
+              playBackgroundAudio();
+            }
+          }}
+          onBuyThunderAudio={() => {
+            if (hasThunderAudio) {
+              if (isPlayingThunder) pauseThunderAudio();
+              else playThunderAudio();
+              return;
+            }
+            if (savings >= 1800) {
+              setSavings((s) => s - 1800);
+              setHasThunderAudio(true);
+              playThunderAudio();
+            }
+          }}
+          onBuyVipCasinoPass={() => {
+            if (hasVipCasinoPass) return;
+            if (savings >= 2200) {
+              setSavings((s) => s - 2200);
+              setHasVipCasinoPass(true);
+            }
+          }}
+          onBuyGoldenResume={() => {
+            if (hasGoldenResume) return;
+            if (savings >= 3000) {
+              setSavings((s) => s - 3000);
+              setHasGoldenResume(true);
+            }
+          }}
+          onBuyNeonTheme={() => {
+            if (hasNeonTheme) return;
+            if (savings >= 3500) {
+              setSavings((s) => s - 3500);
+              setHasNeonTheme(true);
+              setCurrentTheme("hacker");
+            }
+          }}
+          onBuyStarryNight={() => {
+            if (hasStarryNight) return;
+            if (savings >= 4200) {
+              setSavings((s) => s - 4200);
+              setHasStarryNight(true);
+            }
+          }}
+          onBuyCoffeeMachine={() => {
+            if (hasCoffeeMachine) return;
+            if (savings >= 5000) {
+              setSavings((s) => s - 5000);
+              setHasCoffeeMachine(true);
+            }
+          }}
+          onToggleAudio={() => {
+            if (isMusicUnlocked) {
+              pauseBackgroundAudio();
+              setIsMusicUnlocked(false);
+            } else {
+              playBackgroundAudio();
+              setIsMusicUnlocked(true);
+            }
+          }}
+          onToggleRain={() => {
+            if (isPlayingRain) pauseRainAudio();
+            else playRainAudio();
+          }}
+          onToggleThunder={() => {
+            if (isPlayingThunder) pauseThunderAudio();
+            else playThunderAudio();
+          }}
+        />
+      );
+    }
+
+    if (currentView === "casino") {
+      viewContent = (
+        <CasinoPage
+          savings={savings}
+          currentTheme={currentTheme}
+          hasVipCasinoPass={hasVipCasinoPass}
+          onBackToShop={() => setCurrentView("shop")}
+          onWin={(amount) => setSavings((s) => s + amount)}
+          onLoss={(lossAmount) => {
+            if (lossAmount <= savings) {
+              setSavings((s) => s - lossAmount);
+            } else {
+              const debtIncurred = lossAmount - savings;
+              setSavings(0);
+              setDebt((d) => (d || 0) + debtIncurred);
+              setHasSeenFreedomCutscene(false);
+              setCurrentView("dashboard");
+            }
+          }}
+        />
+      );
+    }
+
+    return (
+      <div
+        className={`relative min-h-screen w-full transition-colors duration-300 ${
+          hasCustomButtons
+            ? "retro-buttons-active [&_button]:border [&_button]:border-stone-400 [&_button]:bg-stone-900 [&_button]:text-stone-200 [&_button]:shadow-[2px_2px_0px_#78716c] [&_button]:hover:translate-x-0.5 [&_button]:hover:translate-y-0.5"
+            : ""
+        }`}
+      >
+        {/* Floating Bubbles Particle Layer */}
+        {hasBubbles && (
+          <div className="pointer-events-none fixed inset-0 z-40 overflow-hidden">
+            {Array.from({ length: 24 }).map((_, i) => (
+              <div
+                key={i}
+                className="absolute rounded-full border border-stone-400/30 bg-stone-300/10 animate-pulse"
+                style={{
+                  width: `${(i % 5) * 8 + 14}px`,
+                  height: `${(i % 5) * 8 + 14}px`,
+                  left: `${(i * 4.2) % 96}%`,
+                  top: `${(i * 11.3) % 92}%`,
+                  animationDuration: `${4 + (i % 4) * 1.5}s`,
+                }}
+              />
+            ))}
+          </div>
+        )}
+
+        {/* Starry Night Particle Layer */}
+        {hasStarryNight && (
+          <div className="pointer-events-none fixed inset-0 z-20 overflow-hidden">
+            {Array.from({ length: 36 }).map((_, i) => (
+              <div
+                key={i}
+                className="absolute rounded-full bg-cyan-200 animate-pulse"
+                style={{
+                  width: `${(i % 3) + 2}px`,
+                  height: `${(i % 3) + 2}px`,
+                  top: `${(i * 17) % 98}%`,
+                  left: `${(i * 23) % 98}%`,
+                  opacity: 0.35 + (i % 5) * 0.12,
+                  animationDuration: `${2.2 + (i % 4) * 0.8}s`,
+                }}
+              />
+            ))}
+          </div>
+        )}
+
+        {/* Pinwheel Background Layer */}
+        {hasPinwheel && (
+          <div className="pointer-events-none fixed inset-0 z-30 overflow-hidden">
+            {Array.from({ length: 12 }).map((_, i) => (
+              <div
+                key={i}
+                className="absolute flex items-center justify-center opacity-30"
+                style={{
+                  left: `${(i * 8.5 + 3) % 92}%`,
+                  top: `${(i * 14.2 + 6) % 88}%`,
+                }}
+              >
+                <div
+                  className="w-12 h-12 sm:w-16 sm:h-16 relative animate-spin"
+                  style={{ animationDuration: `${3 + (i % 4) * 2}s` }}
+                >
+                  {[0, 45, 90, 135, 180, 225, 270, 315].map((deg, idx) => (
+                    <div
+                      key={idx}
+                      className={`absolute w-1/2 h-1/2 top-0 left-1/2 origin-bottom-left rounded-tr-full border border-stone-400/30 ${
+                        idx % 4 === 0
+                          ? "bg-amber-500/30"
+                          : idx % 4 === 1
+                            ? "bg-cyan-500/30"
+                            : idx % 4 === 2
+                              ? "bg-rose-500/30"
+                              : "bg-emerald-500/30"
+                      }`}
+                      style={{ transform: `rotate(${deg}deg)` }}
+                    />
+                  ))}
+                  <div className="absolute inset-1/3 rounded-full bg-stone-900 border border-stone-500 z-10" />
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+
+        {/* Vignette Layer */}
+        {hasVignette && (
+          <div className="pointer-events-none fixed inset-0 z-40 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-transparent via-stone-950/60 to-stone-950 shadow-[inset_0_0_120px_rgba(0,0,0,0.95)]" />
+        )}
+
+        {viewContent}
+      </div>
     );
   }
 
   const frozen = scene === "dialogue";
 
   return (
-    <div className="dark fixed inset-0 overflow-hidden bg-background text-foreground">
+    <div
+      className={`fixed inset-0 overflow-hidden transition-colors duration-300 ${
+        currentTheme === "hacker"
+          ? "bg-black text-green-500 font-mono"
+          : "dark bg-background text-foreground"
+      } ${
+        hasCustomButtons
+          ? "[&_button]:border [&_button]:border-stone-400 [&_button]:bg-stone-900 [&_button]:text-stone-200 [&_button]:shadow-[2px_2px_0px_#78716c] [&_button]:hover:translate-x-0.5 [&_button]:hover:translate-y-0.5"
+          : ""
+      }`}
+    >
+      {/* Floating Bubbles Overlay on homescreen */}
+      {hasBubbles && (
+        <div className="pointer-events-none fixed inset-0 z-40 overflow-hidden">
+          {Array.from({ length: 24 }).map((_, i) => (
+            <div
+              key={i}
+              className="absolute rounded-full border border-stone-400/30 bg-stone-300/10 animate-pulse"
+              style={{
+                width: `${(i % 5) * 8 + 14}px`,
+                height: `${(i % 5) * 8 + 14}px`,
+                left: `${(i * 4.2) % 96}%`,
+                top: `${(i * 11.3) % 92}%`,
+                animationDuration: `${4 + (i % 4) * 1.5}s`,
+              }}
+            />
+          ))}
+        </div>
+      )}
+
+      {/* Starry Night Particle Layer */}
+      {hasStarryNight && (
+        <div className="pointer-events-none fixed inset-0 z-20 overflow-hidden">
+          {Array.from({ length: 36 }).map((_, i) => (
+            <div
+              key={i}
+              className="absolute rounded-full bg-cyan-200 animate-pulse"
+              style={{
+                width: `${(i % 3) + 2}px`,
+                height: `${(i % 3) + 2}px`,
+                top: `${(i * 17) % 98}%`,
+                left: `${(i * 23) % 98}%`,
+                opacity: 0.35 + (i % 5) * 0.12,
+                animationDuration: `${2.2 + (i % 4) * 0.8}s`,
+              }}
+            />
+          ))}
+        </div>
+      )}
+
+      {/* Pinwheel & Pinwheel Background Overlay */}
+      {hasPinwheel && (
+        <div className="pointer-events-none fixed inset-0 z-30 overflow-hidden">
+          {Array.from({ length: 12 }).map((_, i) => (
+            <div
+              key={i}
+              className="absolute flex items-center justify-center opacity-30"
+              style={{
+                left: `${(i * 8.5 + 3) % 92}%`,
+                top: `${(i * 14.2 + 6) % 88}%`,
+              }}
+            >
+              <div
+                className="w-12 h-12 sm:w-16 sm:h-16 relative animate-spin"
+                style={{ animationDuration: `${3 + (i % 4) * 2}s` }}
+              >
+                {[0, 45, 90, 135, 180, 225, 270, 315].map((deg, idx) => (
+                  <div
+                    key={idx}
+                    className={`absolute w-1/2 h-1/2 top-0 left-1/2 origin-bottom-left rounded-tr-full border border-stone-400/30 ${
+                      idx % 4 === 0
+                        ? "bg-amber-500/30"
+                        : idx % 4 === 1
+                          ? "bg-cyan-500/30"
+                          : idx % 4 === 2
+                            ? "bg-rose-500/30"
+                            : "bg-emerald-500/30"
+                    }`}
+                    style={{ transform: `rotate(${deg}deg)` }}
+                  />
+                ))}
+                <div className="absolute inset-1/3 rounded-full bg-stone-900 border border-stone-500 z-10" />
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+
+      {/* Screen Shading / Vignette on homescreen */}
+      {hasVignette && (
+        <div className="pointer-events-none fixed inset-0 z-40 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-transparent via-stone-950/60 to-stone-950" />
+      )}
+
       {/* Desktop wallpaper: Hackathon image */}
       <div
         className="desktop-wallpaper absolute inset-0 bg-cover bg-center bg-no-repeat"

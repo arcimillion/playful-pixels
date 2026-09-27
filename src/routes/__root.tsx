@@ -111,6 +111,25 @@ function RootShell({ children }: { children: ReactNode }) {
     <html lang="en">
       <head>
         <HeadContent />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              "@context": "https://schema.org",
+              "@type": "WebApplication",
+              name: "GIG//PORTAL — A Human-Only Story",
+              applicationCategory: "EntertainmentApplication",
+              operatingSystem: "All",
+              description:
+                "A dark, interactive story about a final-year engineering student navigating an automated job market through 100% human-only gigs.",
+              offers: {
+                "@type": "Offer",
+                price: "0",
+                priceCurrency: "USD",
+              },
+            }),
+          }}
+        />
       </head>
       <body>
         {children}
